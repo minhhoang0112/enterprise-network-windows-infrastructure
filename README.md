@@ -23,6 +23,8 @@ The lab is organized into two layers:
 | Network infrastructure | Cisco Packet Tracer | VLANs, trunks, routing, ACLs, NAT/PAT, and simulated public connectivity |
 | Windows infrastructure | VMware Workstation | Active Directory, DNS, DHCP, Group Policy, File Server, and Windows client validation |
 
+Addressing note: the VMware Windows environment uses `192.168.30.0/24` to logically align with the Packet Tracer Server VLAN. The VMware and Packet Tracer environments are not directly connected.
+
 Packet Tracer file: [packet-tracer/Enterprise_Network_Lab.pkt](packet-tracer/Enterprise_Network_Lab.pkt)
 
 ## Technologies Used
@@ -96,7 +98,7 @@ The validation screenshot shows VLAN and trunk configuration from the switching 
 | `G0/0.40` | 40 | `192.168.40.1/24` |
 | `G0/0.99` | 99 | `192.168.99.1/24` |
 
-The validation screenshot shows successful routing checks between internal VLANs.
+The validation screenshot confirms the VLAN subinterfaces are up/up and the internal networks appear as directly connected routes.
 
 ![Inter-VLAN routing validation](images/03-routing-validation.png)
 
@@ -125,6 +127,8 @@ Guest traffic is still permitted to reach non-internal destinations for the simu
 | Outside interface | `GigabitEthernet0/1` |
 | Outside IP | `203.0.113.1/30` |
 | Default route | `203.0.113.2` |
+
+The validation shows `192.168.40.x` traffic being translated to `203.0.113.1`.
 
 ![NAT/PAT on R1-EDGE](images/05-nat-pat-on-r1-edge.png)
 
@@ -203,6 +207,8 @@ DHCP was configured on `SERVER01`. `CLIENT01` was reserved to receive `192.168.3
 | DNS option | `192.168.30.10` |
 | Domain option | `corp.local` |
 
+Lab note: Option 003 Default Gateway was intentionally not configured because the isolated VMware network has no router.
+
 ![DHCP reservation and options](images/08-dhcp-reservation-options.png)
 
 `CLIENT01` was changed from static addressing to DHCP and received its IP and DNS configuration from `SERVER01`.
@@ -257,7 +263,7 @@ Group Policy Preferences and item-level targeting were used to map department dr
 | `GG_HR` | `H:` | `\\SERVER01\CORP-DATA\HR` |
 | `GG_Accounting` | `A:` | `\\SERVER01\CORP-DATA\Accounting` |
 | `GG_Sales` | `S:` | `\\SERVER01\CORP-DATA\Sales` |
-| Public | `P:` | `\\SERVER01\CORP-DATA\Public` |
+| All CORP users | `P:` | `\\SERVER01\CORP-DATA\Public` |
 
 For the validated IT user `CORP\an.nguyen`, the expected mapped drives are `I:` and `P:`.
 
