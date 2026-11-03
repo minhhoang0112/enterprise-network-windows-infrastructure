@@ -30,7 +30,28 @@ They are complementary lab environments representing the network layer and syste
 - CLIENT01 receives DHCP from SERVER01
 - DHCP pool: 192.168.30.20 - 192.168.30.100
 - CLIENT01 reservation: 192.168.30.20
+- Ubuntu static IP exclusion: 192.168.30.30 - 192.168.30.30, added 2026-10-30
 - DNS forward + reverse lookup configured
+
+## VMware / Ubuntu — verified 2026-10-30
+
+- Ubuntu belongs to the project and now shares VMnet2 Host-only with Windows; the previous NAT/DHCP setup was a separate learning configuration.
+- UBUNTU01: Ubuntu 26.04.1 LTS, kernel 7.0.0-42-generic, as reported by the VM.
+- Interface ens33; static IP 192.168.30.30/24; DNS 192.168.30.10; search domain corp.local.
+- No default gateway; Windows host 192.168.30.1 is not a router.
+- Windows DNS A/PTR for UBUNTU01.corp.local were created and validated in both directions.
+- SSH TCP 22 works from Windows, including after reboot.
+- Local group labops contains labmember; labguest is outside labops. These are Linux local accounts, not AD accounts.
+- /srv/system-lab/team is owned by root:labops with mode 2770. Member create/read/modify/delete and nonmember read/create denial were tested.
+- UFW active: deny incoming, allow outgoing, allow 22/tcp for IPv4/IPv6.
+- Temporary TCP 8088 listener tested blocked/allowed/blocked; rule removed and listener stopped.
+- system-lab-demo.service is an enabled oneshot journal exercise; active (exited) is expected, not evidence of a permanent application service.
+- SSH, DNS, permissions, firewall and demo service validated after reboot.
+- Exported report: docs/evidence/ubuntu-report-2026-10-30.txt. Chat-derived supplementary evidence: docs/evidence/ubuntu-validation-2026-10-30.md.
+- Review is based on user-provided outputs; no direct VM execution by the reviewer. Existing Windows/Packet Tracer tests were not comprehensively rerun.
+- No AD join, permanent web server, Linux DHCP/DNS server, backup/restore deployment or monitoring is claimed.
+
+Current Ubuntu details take precedence over the original NAT-based handover and personal execution plan, which are kept locally rather than published. See docs/ubuntu-server-lab.md.
 
 ## Active Directory
 CORP

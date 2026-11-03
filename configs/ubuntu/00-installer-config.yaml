@@ -1,0 +1,19 @@
+# Verified configuration for this VM only, 2026-10-30.
+# VMnet2 Host-only, not NAT. Review interface/MAC before reusing.
+# Preserve any existing configuration before editing; do not paste alongside it.
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 192.168.30.30/24
+      nameservers:
+        addresses:
+          - 192.168.30.10
+        search:
+          - corp.local
+      match:
+        macaddress: 00:0c:29:d7:6a:f7
+      set-name: ens33

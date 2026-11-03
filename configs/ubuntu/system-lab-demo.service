@@ -1,0 +1,10 @@
+[Unit]
+Description=System lab service demonstration
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/logger -t system-lab-demo Lab-service-started
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

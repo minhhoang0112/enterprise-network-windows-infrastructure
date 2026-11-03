@@ -1,0 +1,54 @@
+# User-exported VM report collected 2026-10-30.
+# Machine ID, Boot ID, AF_VSOCK CID and service invocation ID removed.
+
+2026-10-30T07:58:55+00:00
+  Static hostname: UBUNTU01
+        Icon name: computer-vm
+          Chassis: vm 🖴
+Chassis Asset Tag: No Asset Tag
+   Virtualization: vmware
+ Operating System: Ubuntu 26.04.1 LTS
+           Kernel: Linux 7.0.0-42-generic
+     Architecture: x86-64
+  Hardware Vendor: VMware, Inc.
+   Hardware Model: VMware Virtual Platform
+ Hardware Version: None
+ Firmware Version: 6.00
+    Firmware Date: Thu 2020-11-12
+     Firmware Age: 5y 11month 2w 3d
+lo               UNKNOWN        127.0.0.1/8
+ens33            UP             192.168.30.30/24
+192.168.30.0/24 dev ens33 proto kernel scope link src 192.168.30.30
+Link 2 (ens33)
+    Current Scopes: DNS
+         Protocols: +DefaultRoute -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+Current DNS Server: 192.168.30.10
+       DNS Servers: 192.168.30.10
+        DNS Domain: corp.local
+     Default Route: yes
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere                   # SSH management
+22/tcp (v6)                ALLOW IN    Anywhere (v6)              # SSH management
+
+● system-lab-demo.service - System lab service demonstration
+     Loaded: loaded (/etc/systemd/system/system-lab-demo.service; enabled; preset: enabled)
+     Active: active (exited) since Fri 2026-10-30 07:54:22 UTC; 4min 33s ago
+    Process: 1168 ExecStart=/usr/bin/logger -t system-lab-demo Lab-service-started (code=exited, status=0/SUCCESS)
+   Main PID: 1168 (code=exited, status=0/SUCCESS)
+   Mem peak: 1.9M
+        CPU: 31ms
+
+Oct 30 07:54:22 UBUNTU01 systemd[1]: Starting system-lab-demo.service - System lab service demonstration...
+Oct 30 07:54:22 UBUNTU01 system-lab-demo[1168]: Lab-service-started
+Oct 30 07:54:22 UBUNTU01 systemd[1]: Finished system-lab-demo.service - System lab service demonstration.
+Filesystem                         Size  Used Avail Use% Mounted on
+/dev/mapper/ubuntu--vg-ubuntu--lv   17G  5.4G  9.9G  36% /
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+
+0 loaded units listed.

@@ -1,0 +1,18 @@
+# Local tools and caches
+/.tmp-uv-cache/
+__pycache__/
+*.pyc
+~$*
+
+# Personal execution plans and generated guides (keep local copies)
+/docs/Ke_hoach_hoan_thien_lab_Windows_Network_Ubuntu.md
+/docs/Ke_hoach_hoan_thien_lab_Windows_Network_Ubuntu.docx
+/docs/Ke_hoach_hoan_thien_lab_Windows_Network_Ubuntu.pdf
+/docs/Huong_dan_ngan_kiem_tra_Windows_Packet_Tracer.md
+/docs/Huong_dan_ngan_kiem_tra_Windows_Packet_Tracer.docx
+/docs/build_lab_guide.py
+
+# Personal CVs and drafts belong outside the infrastructure portfolio
+/CV/
+/cv/
+/drafts/

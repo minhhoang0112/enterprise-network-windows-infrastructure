@@ -1,8 +1,8 @@
 # Enterprise Network & Windows Server Infrastructure Lab
 
-This repository documents a hands-on IT infrastructure lab built for portfolio practice. It combines a Cisco Packet Tracer network design with a VMware-based Windows Server environment to demonstrate common System, Network, and IT Support administration tasks.
+This repository documents a hands-on IT infrastructure lab built for portfolio practice. It combines a Cisco Packet Tracer network design with VMware-based Windows Server and Ubuntu administration exercises to demonstrate common System, Network, and IT Support tasks.
 
-Cisco Packet Tracer and VMware are complementary lab environments in this project. Packet Tracer represents the network layer, while VMware represents the Windows server and client services layer. They are not directly connected in this implementation.
+Cisco Packet Tracer and VMware are complementary lab environments in this project. Packet Tracer represents the simulated network layer. VMware hosts the Windows server/client services and Ubuntu administration lab. Packet Tracer and VMware are not directly connected. Within VMware, Ubuntu and the Windows machines share the VMnet2 Host-only network; Ubuntu uses Windows DNS but has not been joined to Active Directory.
 
 ## Objectives
 
@@ -12,18 +12,20 @@ Cisco Packet Tracer and VMware are complementary lab environments in this projec
 - Configure Active Directory Domain Services for the `corp.local` domain.
 - Implement DNS, DHCP, Group Policy, SMB file sharing, and NTFS permissions.
 - Join `CLIENT01` to the domain and validate user login, DNS, DHCP, GPO, and mapped drives.
+- Configure `UBUNTU01` with a static IP, Windows-hosted DNS, SSH, local user/group permissions, UFW, and a systemd demonstration service.
 - Document the lab clearly for an intern System / Network / IT Support portfolio.
 
 ## Architecture Overview
 
-The lab is organized into two layers:
+The lab has the following components:
 
 | Layer | Environment | Purpose |
 |---|---|---|
 | Network infrastructure | Cisco Packet Tracer | VLANs, trunks, routing, ACLs, NAT/PAT, and simulated public connectivity |
 | Windows infrastructure | VMware Workstation | Active Directory, DNS, DHCP, Group Policy, File Server, and Windows client validation |
+| Ubuntu administration | VMware Workstation, VMnet2 Host-only | Static IP, Windows DNS integration, SSH, Linux permissions, systemd/journal, and UFW |
 
-Addressing note: the VMware Windows environment uses `192.168.30.0/24` to logically align with the Packet Tracer Server VLAN. The VMware and Packet Tracer environments are not directly connected.
+Addressing note: the VMware Windows/Ubuntu environment uses `192.168.30.0/24` to logically align with the Packet Tracer Server VLAN. Sharing an addressing scheme does not connect VMware to Packet Tracer. VMnet2 has no router or default gateway in this implementation; Windows host address `192.168.30.1` is not a lab router.
 
 Packet Tracer file: [packet-tracer/Enterprise_Network_Lab.pkt](packet-tracer/Enterprise_Network_Lab.pkt)
 
@@ -34,6 +36,8 @@ Packet Tracer file: [packet-tracer/Enterprise_Network_Lab.pkt](packet-tracer/Ent
 | Network simulation | Cisco Packet Tracer |
 | Virtualization | VMware Workstation |
 | Server operating system | Windows Server 2022 |
+| Linux operating system | Ubuntu 26.04.1 LTS, as reported by the VM on 2026-10-30 |
+| Linux administration | Netplan, OpenSSH, local users/groups, POSIX permissions, systemd, journalctl, UFW |
 | Client operating system | Windows 10 Pro |
 | Directory and identity | Active Directory Domain Services |
 | Network services | DNS, DHCP |
@@ -192,6 +196,7 @@ Department security groups were created to control file access and drive mapping
 | Forward lookup zone | `corp.local` |
 | Reverse lookup network | `192.168.30.0/24` |
 | Server record | `SERVER01.corp.local` |
+| Ubuntu A / PTR | `UBUNTU01.corp.local` <-> `192.168.30.30` (added and tested 2026-10-30) |
 
 ![DNS forward and reverse lookup](images/09-dns-forward-reverse.png)
 
@@ -204,12 +209,15 @@ DHCP was configured on `SERVER01`. `CLIENT01` was reserved to receive `192.168.3
 | DHCP server | `SERVER01` |
 | Scope range | `192.168.30.20` to `192.168.30.100` |
 | Client reservation | `CLIENT01` -> `192.168.30.20` |
+| Static Ubuntu IP exclusion | `192.168.30.30` to `192.168.30.30` (added 2026-10-30) |
 | DNS option | `192.168.30.10` |
 | Domain option | `corp.local` |
 
 Lab note: Option 003 Default Gateway was intentionally not configured because the isolated VMware network has no router.
 
 ![DHCP reservation and options](images/08-dhcp-reservation-options.png)
+
+The existing screenshot predates the Ubuntu exclusion. The 2026-10-30 DHCP screenshots and DNS results were supplied during guided validation; see the [Ubuntu validation record](docs/evidence/ubuntu-validation-2026-10-30.md).
 
 `CLIENT01` was changed from static addressing to DHCP and received its IP and DNS configuration from `SERVER01`.
 
@@ -287,7 +295,30 @@ The final policy validation confirms that Group Policy was applied to the client
 
 ![GPO applied validation](images/16-gpo-applied-validation.png)
 
+## Ubuntu Server Administration
+
+`UBUNTU01` was returned from a separate NAT/DHCP learning setup to the project's VMnet2 Host-only network. The basic Ubuntu scope was validated through user-supplied screenshots, command output, and an exported report on 2026-10-30.
+
+| Item | Verified configuration |
+|---|---|
+| OS / kernel reported by VM | Ubuntu 26.04.1 LTS / `7.0.0-42-generic` |
+| Interface / static IP | `ens33`, `192.168.30.30/24` |
+| DNS / search domain | `192.168.30.10`, `corp.local` |
+| Default gateway | None on the isolated Host-only network |
+| Remote administration | Windows host -> SSH TCP 22 as `sysadmin` |
+| Local permission exercise | `labmember` in `labops`; `labguest` outside the group; `/srv/system-lab/team` mode `2770` |
+| Firewall | UFW active; deny incoming, allow outgoing; SSH 22 allowed for IPv4/IPv6 |
+| Service exercise | `system-lab-demo.service`: enabled, oneshot, `active (exited)`, writes a journal message |
+
+The firewall was tested with a temporary Python listener on TCP 8088: blocked, allowed after adding a rule, blocked after deleting it. The listener was then stopped. SSH, DNS, UFW, the demo service and file permissions were checked after reboot.
+
+See the [Ubuntu configuration and validation guide](docs/ubuntu-server-lab.md), [exported report with instance identifiers removed](docs/evidence/ubuntu-report-2026-10-30.txt), and [supplementary validation record](docs/evidence/ubuntu-validation-2026-10-30.md).
+
+This scope covers basic Linux administration. Ubuntu is not an AD member, does not replace Windows DHCP/DNS, and has no permanent web service or Internet route in the current configuration. A successful `dpkg --audit` is not evidence that all available updates have been installed.
+
 ## Testing and Validation
+
+The table below retains the existing Windows/Packet Tracer validation record. Those environments were not comprehensively retested during the Ubuntu session. Ubuntu results and their evidence sources are tracked separately in [the dated validation record](docs/evidence/ubuntu-validation-2026-10-30.md).
 
 | Test | Evidence / command used | Result |
 |---|---|---|
@@ -329,9 +360,16 @@ Enterprise Network & Windows Server Infrastructure Lab/
 |   +-- sw-core-config.txt
 |   +-- sw-server-config.txt
 |   +-- sw-users-config.txt
+|   +-- ubuntu/
+|       +-- 00-installer-config.yaml
+|       +-- system-lab-demo.service
 +-- docs/
 |   +-- project-notes.md
 |   +-- troubleshooting.md
+|   +-- ubuntu-server-lab.md
+|   +-- evidence/
+|       +-- ubuntu-report-2026-10-30.txt
+|       +-- ubuntu-validation-2026-10-30.md
 +-- images/
 |   +-- 01-network-topology.png
 |   +-- 02-vlan-trunk-validation.png
@@ -364,3 +402,4 @@ Enterprise Network & Windows Server Infrastructure Lab/
 - Implemented SMB file sharing with group-based NTFS permissions.
 - Used Group Policy Preferences and item-level targeting for mapped drives.
 - Validated a Windows 10 Pro domain client using common IT support commands and checks.
+- Restored Ubuntu static networking on the Windows lab network and validated forward/reverse DNS, SSH, local permissions, UFW and systemd behavior, including reboot checks.
